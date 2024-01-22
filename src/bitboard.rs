@@ -1,13 +1,5 @@
 use core::fmt;
-use std::ascii::AsciiExt;
-use std::fmt::Debug;
-
-use crate::board::Color;
-use crate::board::Color::{White, Black};
-use crate::board::Board;
-use crate::board::PieceType::{Pawn, Knight, Bishop, Rook, Queen, King};
-use crate::board::{FILES, RANKS};
-use crate::board::Piece;
+use std::fmt::{Debug, Formatter};
 
 
 pub const A_FILE: Bitboard = Bitboard(0x0101010101010101);
@@ -32,7 +24,20 @@ pub const LIGHT_SQUARES: Bitboard = Bitboard(0x5555555555555555);
 pub const DARK_SQUARES: Bitboard = Bitboard(0xAAAAAAAAAAAAAAAA);
 
 
-#[derive(Debug, PartialEq)]
+pub fn idx_to_reading_order(idx: u64) -> u64 {
+    // 0 -> 56      +56     + (56 - ((0/8)*16))
+    // 7 -> 63      +56
+    // 8 -> 48      +40
+    // 15 -> 55     +40
+    // 16 -> 40     +24
+    // 23 -> 47     +24
+    // 24 -> 32     +8
+    // 31 -> 39     +8
+    println!("{}", idx);
+    (idx + 56) - ((idx/8) * 16)
+}
+
+#[derive(PartialEq)]
 pub struct Bitboard(pub u64);
 
 impl Bitboard {
@@ -108,6 +113,42 @@ impl Bitboard {
 
     pub fn not(&self) -> Bitboard {
         Bitboard(!self.0)
+    }
+
+    pub fn get_bit(&self, idx: u8) -> u8 {
+        match self.0 & (1u64 << idx) > 0 {
+            true => 1,
+            false => 0,
+        }
+    }
+
+    pub fn set_bit(&self, idx: u8) -> Bitboard {
+        Bitboard(self.0 | (1u64 << idx))
+    }
+
+    pub fn set_bit_in_place(&mut self, idx:u64) {
+        self.0 = self.0 | (1u64 << idx);
+    }
+
+    pub fn clear_bit(&self, idx: u8) -> Bitboard {
+        Bitboard(self.0 & !(1u64 << idx))
+    }
+
+}
+
+impl Debug for Bitboard {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "\n")?;
+        for rank in (0..8).rev() {
+            write!(f, "{}  ", rank + 1)?;
+            for file in 0..8 {
+                write!(f, "{} ", self.get_bit(rank * 8 + file))?;
+            }
+            write!(f, "\n")?;
+        }
+        write!(f, "\n   A B C D E F G H\n\n\n\
+               hex: {:x}\n\
+               decimal: {}\n\n", self.0, self.0)
     }
 }
 

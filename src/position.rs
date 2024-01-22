@@ -1,13 +1,12 @@
+use unicode_segmentation::UnicodeSegmentation;
+
 use crate::bitboard::Bitboard;
-use crate::bitboard::{A_FILE, B_FILE, C_FILE, D_FILE, 
-                      E_FILE, F_FILE, G_FILE, H_FILE};
-use crate::bitboard::{FIRST_RANK, SECOND_RANK, THIRD_RANK, FOURTH_RANK, 
-                      FIFTH_RANK, SIXTH_RANK, SEVENTH_RANK, EIGHTH_RANK};
-use crate::board::FILES;
+use crate::bitboard::{A_FILE, H_FILE};
 use crate::board::Color;
 
 // TODO: add fields for castling rights, which player's turn, en passant, 
 // half moves, and full moves
+#[derive(PartialEq, Debug)]
 pub struct Position {
     pawns: Bitboard,
     knights: Bitboard,
@@ -21,13 +20,6 @@ pub struct Position {
 
 impl Position {
     pub fn from_fen(fen: String) -> Position {
-        let position_str = fen.split_ascii_whitespace().next().take().unwrap();
-
-        // FEN starts at A8 (i.e. index 7) and moves right and down
-        let mut curr_file = 0;
-        let mut curr_rank = 8;
-        let mut curr_sq = (FILES[curr_file], curr_rank);
-
         let mut pawns = Bitboard(0);
         let mut knights = Bitboard(0);
         let mut bishops = Bitboard(0);
@@ -37,41 +29,46 @@ impl Position {
         let mut white_pieces = Bitboard(0);
         let mut black_pieces = Bitboard(0);
 
-        for character in position_str.chars() {
-
-            if character.is_digit(10) {
-                // move forward `character` files, leaving blank tiles
-                curr_file = curr_file + character.to_digit(10).unwrap() as usize % 8;
-                curr_sq.0 = FILES[curr_file];
-                continue;
+        // iterator containing strings representing 1st, 2nd, ..., 8th ranks
+        let piece_placement: String = fen.split(" ").take(1).collect();
+        let ranks = piece_placement.rsplit("/");
+        let mut rank_offset: u64 = 0;
+        let mut file: u64;
+        let mut character: Option<char>;
+        for rank in ranks {
+            file = 0;
+            for letter in rank.graphemes(false) {
+                character = letter.chars().next();
+                if character.is_none() {break;}
+                if character.unwrap().is_digit(10) {
+                    file = file + u64::from(character.unwrap().to_digit(10).unwrap());
+                    continue;
+                }
+                match character.unwrap().to_ascii_lowercase() {
+                    'p' => pawns.set_bit_in_place(rank_offset + file),
+                    'n' => knights.set_bit_in_place(rank_offset + file),
+                    'b' => bishops.set_bit_in_place(rank_offset + file),
+                    'r' => rooks.set_bit_in_place(rank_offset + file),
+                    'q' => queens.set_bit_in_place(rank_offset + file),
+                    'k' => kings.set_bit_in_place(rank_offset + file),
+                    _ => {
+                        println!("Invalid character\n\
+                                  expected: 'p', 'n', 'b', 'r', 'q', or 'k' (ignoring case)\n\
+                                  got: {}", character.unwrap());
+                        unreachable!();
+                    }
+                }
+                if character.unwrap().is_ascii_uppercase() {
+                    white_pieces.set_bit_in_place(rank_offset + file);
+                } else {
+                    black_pieces.set_bit_in_place(rank_offset + file);
+                }
+                file += 1;
             }
-
-            if character == '/' {
-                curr_rank = curr_rank - 1;
-                curr_file = 0;
-                curr_sq = (FILES[curr_file], curr_rank);
-                continue;
-            }
-
-            // character represents a square occupied by a piece
-            curr_sq = (FILES[curr_file], curr_rank);
-
-            if character.is_ascii_uppercase() {
-                white_pieces = white_pieces.add(Bitboard::from_square(curr_sq));
-            } else if character.is_ascii_lowercase() {
-                black_pieces = black_pieces.add(Bitboard::from_square(curr_sq));
-            }
-
-            match character.to_ascii_lowercase() {
-                'p' => pawns = pawns.add(Bitboard::from_square(curr_sq)),
-                'n' => knights = knights.add(Bitboard::from_square(curr_sq)),
-                'b' => bishops = bishops.add(Bitboard::from_square(curr_sq)),
-                'r' => rooks = rooks.add(Bitboard::from_square(curr_sq)),
-                'q' => queens = queens.add(Bitboard::from_square(curr_sq)),
-                'k' => kings = kings.add(Bitboard::from_square(curr_sq)),
-                _ => unreachable!(),
-            }
+            rank_offset += 8;
         }
+        
+
         Position {
             pawns, 
             knights, 

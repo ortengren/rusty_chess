@@ -1,1 +1,1 @@
-use super::Board;
+use crate::*;

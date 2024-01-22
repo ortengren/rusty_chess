@@ -18,4 +18,28 @@ fn test_get_directions() {
     // TODO: test squares at edges of board
 }
 
-// TODO: test from_fen()
+#[test]
+fn test_idx_to_reading_order() {
+    assert_eq!(idx_to_reading_order(0), 56);
+    assert_eq!(idx_to_reading_order(7), 63);
+    assert_eq!(idx_to_reading_order(8), 48);
+    assert_eq!(idx_to_reading_order(20), 44);
+    assert_eq!(idx_to_reading_order(28), 36);
+    assert_eq!(idx_to_reading_order(32), 24);
+    assert_eq!(idx_to_reading_order(39), 31);
+    assert_eq!(idx_to_reading_order(40), 16);
+    assert_eq!(idx_to_reading_order(47), 23);
+    assert_eq!(idx_to_reading_order(48), 8);
+    assert_eq!(idx_to_reading_order(55), 15);
+    assert_eq!(idx_to_reading_order(56), 0);
+    assert_eq!(idx_to_reading_order(63), 7);
+}
+
+#[test]
+fn test_or() {
+    assert_eq!(Bitboard(1), Bitboard(0).or(Bitboard(1)));
+    assert_eq!(Bitboard(72057937635311746), 
+               Bitboard(72057662757404800).or(Bitboard(274877906946)));
+    assert_eq!(Bitboard(51541704864), 
+               Bitboard(51541704704).or(Bitboard(2097312)));
+}
