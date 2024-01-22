@@ -15,6 +15,10 @@ fn test_get_directions() {
     assert_eq!(d4.shift_nw(), Bitboard(0x400000000));
     assert_eq!(d4.shift_north(), Bitboard(0x800000000));
     assert_eq!(d4.shift_ne(), Bitboard(0x1000000000));
+
+    let e4: Bitboard = Bitboard(268435456);
+    assert_eq!(e4.shift_ne(), Bitboard(137438953472));
+    assert_eq!(e4.shift_sw(), Bitboard(524288));
     // TODO: test squares at edges of board
 }
 
@@ -42,4 +46,12 @@ fn test_or() {
                Bitboard(72057662757404800).or(Bitboard(274877906946)));
     assert_eq!(Bitboard(51541704864), 
                Bitboard(51541704704).or(Bitboard(2097312)));
+}
+
+#[test]
+fn test_set_bit_in_place() {
+    let mut actual = Bitboard(0);
+    actual.set_bit_in_place(28);
+
+    assert_eq!(Bitboard(268435456), actual);
 }

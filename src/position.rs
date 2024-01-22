@@ -35,6 +35,7 @@ impl Position {
         let mut rank_offset: u64 = 0;
         let mut file: u64;
         let mut character: Option<char>;
+        let mut square: u8;
         for rank in ranks {
             file = 0;
             for letter in rank.graphemes(false) {
@@ -44,13 +45,18 @@ impl Position {
                     file = file + u64::from(character.unwrap().to_digit(10).unwrap());
                     continue;
                 }
+
+                square = (rank_offset + file)
+                    .try_into()
+                    .unwrap();
+
                 match character.unwrap().to_ascii_lowercase() {
-                    'p' => pawns.set_bit_in_place(rank_offset + file),
-                    'n' => knights.set_bit_in_place(rank_offset + file),
-                    'b' => bishops.set_bit_in_place(rank_offset + file),
-                    'r' => rooks.set_bit_in_place(rank_offset + file),
-                    'q' => queens.set_bit_in_place(rank_offset + file),
-                    'k' => kings.set_bit_in_place(rank_offset + file),
+                    'p' => pawns.set_bit_in_place(square),
+                    'n' => knights.set_bit_in_place(square),
+                    'b' => bishops.set_bit_in_place(square),
+                    'r' => rooks.set_bit_in_place(square),
+                    'q' => queens.set_bit_in_place(square),
+                    'k' => kings.set_bit_in_place(square),
                     _ => {
                         println!("Invalid character\n\
                                   expected: 'p', 'n', 'b', 'r', 'q', or 'k' (ignoring case)\n\
@@ -59,9 +65,9 @@ impl Position {
                     }
                 }
                 if character.unwrap().is_ascii_uppercase() {
-                    white_pieces.set_bit_in_place(rank_offset + file);
+                    white_pieces.set_bit_in_place(square);
                 } else {
-                    black_pieces.set_bit_in_place(rank_offset + file);
+                    black_pieces.set_bit_in_place(square);
                 }
                 file += 1;
             }
@@ -81,7 +87,10 @@ impl Position {
         }
     }
 
-    pub fn get_king_moves(&self, king_pos: Bitboard, color: Color) -> Bitboard {
+//    pub fn get_king_moves(&self, king_pos: Bitboard, color: Color) -> Bitboard {
+        
+
+
         /*
         match square {
             ('A', 1) => Bitboard(0x0000000000000302),
@@ -108,7 +117,7 @@ impl Position {
             ('D', 5) => Bitboard()
             _ => unreachable!(),
         }
-        */
+        
         let mut neighbor_squares: Bitboard = 
             king_pos.shift_east()
                     .or(king_pos.shift_se())
@@ -131,7 +140,8 @@ impl Position {
                 Color::Black => self.black_pieces.not(),
             });
         open_squares
-    }
+        */
+//    }
 }
 
 mod tests;

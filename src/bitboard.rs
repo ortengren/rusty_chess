@@ -37,7 +37,51 @@ pub fn idx_to_reading_order(idx: u64) -> u64 {
     (idx + 56) - ((idx/8) * 16)
 }
 
-#[derive(PartialEq)]
+pub fn is_on_a_file(square: u8) -> bool {
+    square % 8 == 0
+}
+
+pub fn is_on_b_file(square: u8) -> bool {
+    square % 8 == 1
+}
+
+pub fn is_on_g_file(square: u8) -> bool {
+    square % 8 == 6
+}
+
+pub fn is_on_h_file(square: u8) -> bool {
+    square % 8 == 7
+}
+
+pub fn is_on_first_rank(square: u8) -> bool {
+    square <= 7
+}
+
+pub fn is_on_second_rank(square: u8) -> bool {
+    square >= 8 && square <= 15
+}
+
+pub fn is_on_seventh_rank(square: u8) -> bool {
+    square >= 48 && square <= 55
+}
+
+pub fn is_on_eighth_rank(square: u8) -> bool {
+    square >= 56
+}
+
+pub fn not(bitboard: &Bitboard) -> Bitboard {
+    Bitboard(!bitboard.0)
+}
+
+pub fn and(bb1: &Bitboard, bb2: &Bitboard) -> Bitboard {
+    Bitboard(bb1.0 & bb2.0)
+}
+
+pub fn or(bb1: &Bitboard, bb2: &Bitboard) -> Bitboard {
+    Bitboard(bb1.0 | bb2.0)
+}
+
+#[derive(PartialEq, Clone, Copy)]
 pub struct Bitboard(pub u64);
 
 impl Bitboard {
@@ -126,7 +170,7 @@ impl Bitboard {
         Bitboard(self.0 | (1u64 << idx))
     }
 
-    pub fn set_bit_in_place(&mut self, idx:u64) {
+    pub fn set_bit_in_place(&mut self, idx:u8) {
         self.0 = self.0 | (1u64 << idx);
     }
 
@@ -149,6 +193,12 @@ impl Debug for Bitboard {
         write!(f, "\n   A B C D E F G H\n\n\n\
                hex: {:x}\n\
                decimal: {}\n\n", self.0, self.0)
+    }
+}
+
+impl Default for Bitboard {
+    fn default() -> Bitboard {
+        Bitboard(0)
     }
 }
 
