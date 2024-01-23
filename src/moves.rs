@@ -170,13 +170,4 @@ pub fn init_leaper_attacks() -> LeaperAttackTable {
     }
 }
 
-pub fn mask_bishop_attacks(square: usize) -> Bitboard {
-    let mut attack_bb = Bitboard(0);
-    
-    let mut rank: u8;
-    let mut file: u8;
-
-    todo!();
-}
-
 mod tests;

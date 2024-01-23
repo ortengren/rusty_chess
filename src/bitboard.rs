@@ -20,19 +20,46 @@ pub const SIXTH_RANK: Bitboard = Bitboard(0x0000ff0000000000);
 pub const SEVENTH_RANK: Bitboard = Bitboard(0x00ff000000000000);
 pub const EIGHTH_RANK: Bitboard = Bitboard(0xff00000000000000);
 
+pub const FIRST_DIAG: Bitboard = Bitboard(0x100000000000000);
+pub const SECOND_DIAG: Bitboard = Bitboard(0x201000000000000);
+pub const THIRD_DIAG: Bitboard = Bitboard(0x402010000000000);
+pub const FOURTH_DIAG: Bitboard = Bitboard(0x804020100000000);
+pub const FIFTH_DIAG: Bitboard = Bitboard(0x1008040201000000);
+pub const SIXTH_DIAG: Bitboard = Bitboard(0x2010080402010000);
+pub const SEVENTH_DIAG: Bitboard = Bitboard(0x4020100804020100);
+pub const EIGHTH_DIAG: Bitboard = Bitboard(0x8040201008040201);
+pub const NINTH_DIAG: Bitboard = Bitboard(0x80402010080402);
+pub const TENTH_DIAG: Bitboard = Bitboard(0x804020100804);
+pub const ELEVENTH_DIAG: Bitboard = Bitboard(0x8040201008);
+pub const TWELFTH_DIAG: Bitboard = Bitboard(0x80402010);
+pub const THIRTEENTH_DIAG: Bitboard = Bitboard(0x804020);
+pub const FOURTEENTH_DIAG: Bitboard = Bitboard(0x8040);
+pub const FIFTEENTH_DIAG: Bitboard = Bitboard(0x80);
+
+pub const FIRST_ANTIDIAG: Bitboard = Bitboard(0x1);
+pub const SECOND_ANTIDIAG: Bitboard = Bitboard(0x102);
+pub const THIRD_ANTIDIAG: Bitboard = Bitboard(0x10204);
+pub const FOURTH_ANTIDIAG: Bitboard = Bitboard(0x1020408);
+pub const FIFTH_ANTIDIAG: Bitboard = Bitboard(0x102040810);
+pub const SIXTH_ANTIDIAG: Bitboard = Bitboard(0x10204081020);
+pub const SEVENTH_ANTIDIAG: Bitboard = Bitboard(0x1020408102040);
+pub const EIGHTH_ANTIDIAG: Bitboard = Bitboard(0x102040810204080);
+pub const NINTH_ANTIDIAG: Bitboard = Bitboard(0x204081020408000);
+pub const TENTH_ANTIDIAG: Bitboard = Bitboard(0x408102040800000);
+pub const ELEVENTH_ANTIDIAG: Bitboard = Bitboard(0x810204080000000);
+pub const TWELFTH_ANTIDIAG: Bitboard = Bitboard(0x1020408000000000);
+pub const THIRTEENTH_ANTIDIAG: Bitboard = Bitboard(0x2040800000000000);
+pub const FOURTEENTH_ANTIDIAG: Bitboard = Bitboard(0x4080000000000000);
+pub const FIFTEENTH_ANTIDIAG: Bitboard = Bitboard(0x8000000000000000);
+
 pub const LIGHT_SQUARES: Bitboard = Bitboard(0x5555555555555555);
 pub const DARK_SQUARES: Bitboard = Bitboard(0xAAAAAAAAAAAAAAAA);
 
+pub const OUTER_SQUARES: Bitboard = 
+    Bitboard(FIRST_RANK.0 | EIGHTH_RANK.0 | A_FILE.0 | H_FILE.0);
+
 
 pub fn idx_to_reading_order(idx: u64) -> u64 {
-    // 0 -> 56      +56     + (56 - ((0/8)*16))
-    // 7 -> 63      +56
-    // 8 -> 48      +40
-    // 15 -> 55     +40
-    // 16 -> 40     +24
-    // 23 -> 47     +24
-    // 24 -> 32     +8
-    // 31 -> 39     +8
     println!("{}", idx);
     (idx + 56) - ((idx/8) * 16)
 }
@@ -180,13 +207,21 @@ impl Bitboard {
 
 }
 
+pub fn format_bit(bit: u8) -> char {
+    match bit {
+        0 => '.',
+        1 => '1',
+        _ => unreachable!(),
+    }
+}
+
 impl Debug for Bitboard {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "\n")?;
         for rank in (0..8).rev() {
             write!(f, "{}  ", rank + 1)?;
             for file in 0..8 {
-                write!(f, "{} ", self.get_bit(rank * 8 + file))?;
+                write!(f, "{} ", format_bit(self.get_bit(rank * 8 + file)))?;
             }
             write!(f, "\n")?;
         }

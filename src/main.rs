@@ -1,8 +1,8 @@
 use rusty_chess::bitboard::Bitboard;
-use rusty_chess::board::Color::{Black, White};
-use rusty_chess::moves;
+use rusty_chess::tables;
 
 fn main() {
-    let test: Bitboard = Bitboard(268435456);
-    print!("{:?}", moves::mask_pawn_attacks(28, Black));
+    let blockers = Bitboard(4535485481984);
+    println!("{:?}", blockers);
+    print!("{:?}", tables::otf_bishop_attacks(28, blockers));
 }
